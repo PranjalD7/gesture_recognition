@@ -1,8 +1,12 @@
 import tensorflow as tf
-from keras.preprocessing.image import ImageDataGenerator
-tf.__version__
-from PIL import Image
-
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Model,Sequential
+from tensorflow.keras.layers import Input,GlobalAveragePooling2D,Dense,Dropout,Flatten
+from tensorflow.keras.layers import Conv2D,MaxPooling2D,BatchNormalization
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.optimizers import RMSprop,Adam
+#from tensorflow.keras import initializers
 train_datagen = ImageDataGenerator(
         rescale=1./255,
         shear_range=0.1,
@@ -45,7 +49,32 @@ cnn.add(tf.keras.layers.Dense(units=20, activation='softmax'))
 
 # Compiling the CNN
 
+
+#constructing callback to save best model to disk and reducing LR
+from tensorflow.keras.callbacks import ModelCheckpoint,ReduceLROnPlateau
+filepath=r'C:/Users/pranj/OneDrive/Desktop/ges_dataset'
+checkpoint = ModelCheckpoint(filepath,monitor='val_accuracy',mode='max',save_best_only=True,verbose=1)
+lrp = ReduceLROnPlateau(monitor='val_loss', factor=0.99, patience=3)
+callbacks=[checkpoint,lrp]
+
 cnn.compile(optimizer = 'adam', loss = 'sparse_categorical_crossentropy', metrics = ['accuracy'])
 
-# Training the CNN on the Training set and evaluating it on the Test set
-cnn.fit(x = training_set, validation_data = test_set, epochs=25)
+
+
+#cnn.fit(x = training_set, validation_data = test_set, epochs=25)
+
+train_steps=training_set.samples//64
+validation_steps=test_set.samples//64
+
+
+history=cnn.fit_generator(
+    training_set,
+    steps_per_epoch=train_steps,
+    epochs=25,
+    validation_data=test_set,
+    validation_steps=validation_steps,
+    callbacks=callbacks
+
+
+)
+
