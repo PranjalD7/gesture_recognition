@@ -14,7 +14,7 @@ class HandDetector:
     many fingers are up or the distance between two fingers. Also
     provides bounding box info of the hand found.
     """
-
+    
     def __init__(self, mode=False,maxHands=2, detectionCon=0.5, minTrackCon=0.5):
         """
         :param mode: In static mode, detection is done on each image: slower
@@ -96,6 +96,7 @@ class HandDetector:
 
 def main():
     cap = cv2.VideoCapture(0)
+    class1=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
     detector = HandDetector(detectionCon=0.8, maxHands=2)
     while True:
         # Get image frame
@@ -108,15 +109,16 @@ def main():
         test_image=cv2.resize(test_image,(50,50))
         test_image=np.asarray(test_image)
         test_image=np.expand_dims(test_image, axis=0)
-        result=model.predict(test_image)
+        result=class1[np.argmax(model.predict(test_image))]
         print(result)
+       
    
      
 
         if cv2.waitKey(5) & 0xFF == ord('q'):
            break
     cap.release()
-    cv2.destroyALlWindows()
+    cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
