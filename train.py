@@ -52,7 +52,7 @@ cnn.add(tf.keras.layers.Dense(units=20, activation='softmax'))
 
 #constructing callback to save best model to disk and reducing LR
 from tensorflow.keras.callbacks import ModelCheckpoint,ReduceLROnPlateau
-filepath=r'C:/Users/pranj/OneDrive/Desktop/ges_dataset'
+filepath=r'C:/Users/pranj/OneDrive/Desktop/gesture_recognition/weights.h5'
 checkpoint = ModelCheckpoint(filepath,monitor='val_accuracy',mode='max',save_best_only=True,verbose=1)
 lrp = ReduceLROnPlateau(monitor='val_loss', factor=0.99, patience=3)
 callbacks=[checkpoint,lrp]
@@ -77,4 +77,6 @@ history=cnn.fit_generator(
 
 
 )
+
+cnn.save(r'C:/Users/pranj/OneDrive/Desktop/gesture_recognition')
 
