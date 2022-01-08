@@ -88,7 +88,7 @@ class HandDetector:
                     cv2.putText(img,myHand["type"],(bbox[0] - 30, bbox[1] - 30),cv2.FONT_HERSHEY_PLAIN,
                                 2,(255, 0, 255),2)
         if draw:
-            return allHands,img
+            return allHands,img,bbox
         else:
             return allHands
 
@@ -102,10 +102,10 @@ def main():
         # Get image frame
         success, img = cap.read()
         # Find the hand and its landmarks
-        hands, img = detector.findHands(img)  # with draw
+        hands,img,coor= detector.findHands(img)  # with draw
         # hands = detector.findHands(img, draw=False)  # without draw
         cv2.imshow("Image", img)
-        test_image=img
+        test_image=img[coor[1] - 20 : coor[1] + coor[3] + 20 , coor[0] - 20 : coor[0] + coor[2] + 20]
         test_image=cv2.resize(test_image,(50,50))
         test_image=np.asarray(test_image)
         test_image=np.expand_dims(test_image, axis=0)
