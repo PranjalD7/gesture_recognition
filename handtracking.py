@@ -7,6 +7,7 @@ import mediapipe as mp
 import math
 from keras.preprocessing import image
 import numpy as np
+emptyt=()
 class HandDetector:
     """
     Finds Hands using the mediapipe library. Exports the landmarks
@@ -60,6 +61,7 @@ class HandDetector:
                     yList.append(py)
 
                 ## bbox
+             
                 xmin, xmax = min(xList), max(xList)
                 ymin, ymax = min(yList), max(yList)
                 boxW, boxH = xmax - xmin, ymax - ymin
@@ -78,7 +80,7 @@ class HandDetector:
                         myHand["type"] = "Right"
                 else:myHand["type"] = handType.classification[0].label
                 allHands.append(myHand)
-
+            
                 ## draw
                 if draw:
                     
@@ -87,15 +89,24 @@ class HandDetector:
                                   (255, 0, 255), 2)
                     cv2.putText(img,myHand["type"],(bbox[0] - 30, bbox[1] - 30),cv2.FONT_HERSHEY_PLAIN,
                                 2,(255, 0, 255),2)
-        if draw:
-            return allHands,img,bbox
+        if not allHands:
+             return allHands,img,emptyt
         else:
-            return allHands
+             return allHands,img,bbox
+       
 
   
 
 def main():
+    import vlc
+    media = vlc.MediaPlayer(r'C:\Users\pranj\Downloads\file_example_MP4_1920_18MG.mp4')
+    media.play()
+    
     cap = cv2.VideoCapture(0)
+    
+   
+
+  
     class1=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
     detector = HandDetector(detectionCon=0.8, maxHands=2)
     while True:
@@ -103,24 +114,31 @@ def main():
         success, img = cap.read()
         # Find the hand and its landmarks
         hands,img,coor= detector.findHands(img)  # with draw
+        
         # hands = detector.findHands(img, draw=False)  # without draw
+        
         cv2.imshow("Image", img)
+        if not hands:          
+          continue
+       
         test_image=img[coor[1] - 20 : coor[1] + coor[3] + 20 , coor[0] - 20 : coor[0] + coor[2] + 20]
         test_image=cv2.resize(test_image,(50,50))
         test_image=np.asarray(test_image)
         test_image=np.expand_dims(test_image, axis=0)
         result=class1[np.argmax(model.predict(test_image))]
         print(result)
+        if result == 0:
+            media.stop()
        
    
      
 
-        if cv2.waitKey(5) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
            break
+       
     cap.release()
     cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
     main()
-
