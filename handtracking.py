@@ -109,6 +109,8 @@ def main():
   
     class1=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
     detector = HandDetector(detectionCon=0.8, maxHands=2)
+    flag=0
+    c=0
     while True:
         # Get image frame
         success, img = cap.read()
@@ -123,17 +125,26 @@ def main():
        
         test_image=img[coor[1] - 20 : coor[1] + coor[3] + 20 , coor[0] - 20 : coor[0] + coor[2] + 20]
         test_image=cv2.resize(test_image,(50,50))
+ 
         test_image=np.asarray(test_image)
         test_image=np.expand_dims(test_image, axis=0)
         result=class1[np.argmax(model.predict(test_image))]
         print(result)
-        if result == 0:
-            media.stop()
-       
+        if result == 15:
+            c+=1
+        else:
+            c=0
+            
+        if result == 0 and flag!=1:
+             media.pause()
+             flag=1
+        elif c>=10:
+            media.play()
+            flag=0
    
      
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(10) & 0xFF == ord('q'):
            break
        
     cap.release()
